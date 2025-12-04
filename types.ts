@@ -4,6 +4,8 @@ export interface Station {
   station_name: string;
   is_diverted_station: boolean;
   distance_from_source: number;
+  distance_from_current_station?: number;
+  distance_from_current_station_txt?: string;
   sta: string; // Scheduled Time Arrival
   std: string; // Scheduled Time Departure
   eta: string; // Estimated Time Arrival
@@ -14,6 +16,7 @@ export interface Station {
   platform_number: number;
   station_lat?: number;
   station_lng?: number;
+  on_time_rating?: number;
   non_stops?: Station[];
 }
 
@@ -41,7 +44,8 @@ export interface TrainResponse {
   dest_stn_name: string;
   run_days: string;
   current_station_name: string;
-  status: string; // "T" usually
+  current_station_code: string;
+  status: string;
   eta: string;
   etd: string;
   delay: number; // in minutes
@@ -54,8 +58,7 @@ export interface TrainResponse {
   previous_stations: Station[];
   next_stoppage_info: NextStoppageInfo;
   current_location_info: CurrentLocationInfo[];
-}
-
-export interface SearchParams {
-  trainNumber: string;
+  avg_speed: number;
+  journey_time: number;
+  std: string; // Source departure
 }

@@ -10,7 +10,7 @@ export const parseTrainNumberFromUrl = (): string | null => {
       return params.get('train');
     } else {
       // Direct ?12345
-      return search.substring(1);
+      return search.substring(1).replace('/', ''); // simple cleanup
     }
   }
   
@@ -25,19 +25,17 @@ export const parseTrainNumberFromUrl = (): string | null => {
 
 export const fetchTrainStatus = async (trainNumber: string): Promise<TrainResponse> => {
   try {
-    // Note: In a production environment, this should go through a proxy to avoid CORS issues 
-    // if the provider doesn't allow direct browser access.
-    // For this specific requirement, we fetch directly.
+    // Using the specific API endpoint requested
     const response = await fetch(`https://livestatus.railyatri.in/api/v3/train_eta_data/${trainNumber}/0.json?start_day=0`);
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.statusText}`);
+      throw new Error(`Service Unavailable: ${response.status}`);
     }
 
     const data = await response.json();
     
     if (!data || !data.success) {
-      throw new Error("Train not found or service unavailable");
+      throw new Error("Train information not found. Please check the train number.");
     }
 
     return data as TrainResponse;
