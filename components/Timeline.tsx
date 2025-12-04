@@ -4,24 +4,31 @@ import { Station } from '../types';
 interface TimelineProps {
   previous: Station[];
   upcoming: Station[];
-  currentStationCode: string;
+  currentStation: {
+    station_code: string;
+    station_name: string;
+    distance_from_source: number;
+    sta: string;
+    eta: string;
+    delay: number;
+  };
 }
 
-export const Timeline: React.FC<TimelineProps> = ({ previous = [], upcoming = [], currentStationCode }) => {
-  // Combine lists: Previous stations first, then upcoming
-  // Note: previous_stations usually comes in reverse order (nearest passed first) or correct order depending on API. 
-  // Based on the sample JSON, previous stations are in order from source (si_no 1 to 93).
-  // Upcoming stations are si_no 95 to end.
-  // We should render them all in order.
-  
-  const allStations = [...previous, ...upcoming];
-
-  // Helper to determine delay status color
-  const getDelayColor = (delay: number) => {
-    if (!delay || delay <= 0) return 'text-emerald-600 bg-emerald-50';
-    if (delay < 15) return 'text-amber-600 bg-amber-50';
-    return 'text-rose-600 bg-rose-50';
+export const Timeline: React.FC<TimelineProps> = ({ previous = [], upcoming = [], currentStation }) => {
+  // Construct a simulated "current station" object that fits the list
+  // The API gives current station info in the root object, so we manually create a station entry for it
+  const currentStationObj: any = {
+    station_code: currentStation.station_code,
+    station_name: currentStation.station_name,
+    distance_from_source: currentStation.distance_from_source,
+    sta: currentStation.sta,
+    eta: currentStation.eta,
+    arrival_delay: currentStation.delay,
+    is_current: true
   };
+
+  // Combine lists: Previous -> Current -> Upcoming
+  const allStations = [...previous, currentStationObj, ...upcoming];
 
   const formatTime = (timeStr: string) => {
     if (!timeStr) return '--:--';
@@ -29,73 +36,68 @@ export const Timeline: React.FC<TimelineProps> = ({ previous = [], upcoming = []
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6">
-      <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
-        <span className="w-1 h-6 bg-indigo-500 rounded-full mr-3"></span>
-        Full Route
-      </h3>
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-0 overflow-hidden">
+      <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+        <h3 className="text-base font-bold text-slate-800 uppercase tracking-wide">
+          Journey Timeline
+        </h3>
+      </div>
 
-      <div className="relative pl-4 space-y-0">
-        {/* Vertical Line */}
-        <div className="absolute left-[23px] top-4 bottom-4 w-0.5 bg-slate-200"></div>
+      <div className="relative p-6">
+        {/* Continuous Vertical Line */}
+        <div className="absolute left-[39px] top-6 bottom-6 w-[2px] bg-slate-100"></div>
 
-        {allStations.map((station, index) => {
-          // Determine status based on list membership
-          // If it's in previous list, it's passed.
-          // If it's the last one in previous list, it might be the "just left" one.
-          // Or we can check based on array membership.
-          const isPassed = index < previous.length;
-          const isCurrent = station.station_code === currentStationCode;
-          const isUpcoming = index >= previous.length;
-
-          return (
-            <div key={`${station.station_code}-${index}`} className={`relative flex items-start group ${index !== allStations.length - 1 ? 'pb-8' : ''}`}>
-              
-              {/* Node Indicator */}
-              <div className={`
-                relative z-10 flex-shrink-0 w-4 h-4 rounded-full border-2 mt-1.5 mr-6
-                ${isPassed 
-                  ? 'bg-slate-200 border-slate-300' 
-                  : isCurrent 
-                    ? 'bg-indigo-600 border-indigo-600 shadow-[0_0_0_4px_rgba(79,70,229,0.2)]'
-                    : 'bg-white border-indigo-400'
-                }
-              `}></div>
-
-              {/* Station Details */}
-              <div className={`flex-1 min-w-0 ${isPassed ? 'opacity-60 grayscale' : ''}`}>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                  <div className="mb-1 sm:mb-0">
-                    <h4 className={`text-base font-bold ${isPassed ? 'text-slate-600' : 'text-slate-900'}`}>
-                      {station.station_name}
-                    </h4>
-                    <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                      <span className="font-mono">{station.station_code}</span>
-                      <span>•</span>
-                      <span>{station.distance_from_source}km</span>
-                    </div>
+        <div className="space-y-0">
+          {allStations.map((station, index) => {
+            const isPassed = index < previous.length;
+            const isCurrent = station.is_current;
+            
+            return (
+              <div key={`${station.station_code}-${index}`} className={`relative flex gap-6 ${index !== allStations.length - 1 ? 'pb-10' : ''}`}>
+                
+                {/* Time Column (Left) */}
+                <div className="w-16 text-right flex-shrink-0 pt-0.5">
+                  <div className={`text-sm font-bold font-mono ${isPassed ? 'text-slate-400' : 'text-slate-900'}`}>
+                    {formatTime(station.eta || station.sta)}
                   </div>
-
-                  <div className="text-left sm:text-right flex flex-row sm:flex-col gap-4 sm:gap-0 mt-2 sm:mt-0">
-                    <div>
-                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Arrival</span>
-                      <span className="font-mono font-medium text-slate-700">
-                        {formatTime(isPassed ? station.eta : station.sta)}
-                      </span>
+                  {station.arrival_delay > 0 && !isPassed && (
+                    <div className="text-[10px] text-rose-500 font-bold mt-0.5">
+                      +{station.arrival_delay} min
                     </div>
-                    {station.arrival_delay > 0 && (
-                      <div className="sm:mt-1">
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${getDelayColor(station.arrival_delay)}`}>
-                          +{station.arrival_delay}m
-                        </span>
-                      </div>
-                    )}
+                  )}
+                </div>
+
+                {/* Node & Line */}
+                <div className="relative z-10 flex flex-col items-center flex-shrink-0">
+                   <div className={`
+                    w-3 h-3 rounded-full border-2 
+                    ${isCurrent 
+                      ? 'bg-indigo-600 border-indigo-600 ring-4 ring-indigo-50' 
+                      : isPassed 
+                        ? 'bg-slate-300 border-slate-300' 
+                        : 'bg-white border-slate-300'
+                    }
+                   `}></div>
+                </div>
+
+                {/* Station Details (Right) */}
+                <div className={`flex-1 min-w-0 pt-[-4px] ${isPassed ? 'opacity-50' : ''}`}>
+                  <h4 className={`text-sm font-bold truncate ${isCurrent ? 'text-indigo-600' : 'text-slate-800'}`}>
+                    {station.station_name}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                      {station.station_code}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {station.distance_from_source} km
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

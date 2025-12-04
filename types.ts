@@ -6,10 +6,10 @@ export interface Station {
   distance_from_source: number;
   distance_from_current_station?: number;
   distance_from_current_station_txt?: string;
-  sta: string; // Scheduled Time Arrival
-  std: string; // Scheduled Time Departure
-  eta: string; // Estimated Time Arrival
-  etd: string; // Estimated Time Departure
+  sta: string;
+  std: string;
+  eta: string;
+  etd: string;
   halt: number;
   a_day: number;
   arrival_delay: number;
@@ -17,6 +17,7 @@ export interface Station {
   station_lat?: number;
   station_lng?: number;
   on_time_rating?: number;
+  day?: number;
 }
 
 export interface CurrentLocationInfo {
@@ -60,6 +61,7 @@ export interface TrainResponse {
   distance_from_source: number;
   total_distance: number;
   avg_speed: number;
+  si_no: number; // Current station serial number
   current_station_code: string;
   current_station_name: string;
   status: string;

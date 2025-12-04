@@ -9,7 +9,11 @@ import {
   AlertCircle,
   CheckCircle2,
   MoreVertical,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  MessageSquare,
+  Send,
+  Bot
 } from 'lucide-react';
 
 export const TrainIcon = ({ className }: { className?: string }) => <Train className={className} />;
@@ -22,3 +26,7 @@ export const AlertIcon = ({ className }: { className?: string }) => <AlertCircle
 export const CheckIcon = ({ className }: { className?: string }) => <CheckCircle2 className={className} />;
 export const DotsIcon = ({ className }: { className?: string }) => <MoreVertical className={className} />;
 export const ArrowRightIcon = ({ className }: { className?: string }) => <ArrowRight className={className} />;
+export const SparklesIcon = ({ className }: { className?: string }) => <Sparkles className={className} />;
+export const MessageSquareIcon = ({ className }: { className?: string }) => <MessageSquare className={className} />;
+export const SendIcon = ({ className }: { className?: string }) => <Send className={className} />;
+export const BotIcon = ({ className }: { className?: string }) => <Bot className={className} />;
