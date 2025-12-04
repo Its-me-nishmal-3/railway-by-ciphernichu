@@ -1,0 +1,5 @@
+{
+  "name": "TrackRail Live",
+  "description": "A modern, minimalist train tracking application providing real-time status, delays, and station timelines.",
+  "requestFramePermissions": []
+}
