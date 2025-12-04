@@ -17,7 +17,6 @@ export interface Station {
   station_lat?: number;
   station_lng?: number;
   on_time_rating?: number;
-  non_stops?: Station[];
 }
 
 export interface CurrentLocationInfo {
@@ -37,28 +36,45 @@ export interface NextStoppageInfo {
 
 export interface TrainResponse {
   success: boolean;
+  user_id: number;
   train_number: string;
   train_name: string;
+  gps_unable: boolean;
   train_start_date: string;
+  notification_date: string;
+  at_src_dstn: boolean;
+  at_src: boolean;
+  at_dstn: boolean;
+  is_run_day: boolean;
+  source: string;
+  destination: string;
   source_stn_name: string;
   dest_stn_name: string;
   run_days: string;
-  current_station_name: string;
+  journey_time: number;
+  std: string;
+  fog_incidence_probability: number;
+  pantry_available: boolean;
+  update_time: string;
+  travelling_towards: string;
+  distance_from_source: number;
+  total_distance: number;
+  avg_speed: number;
   current_station_code: string;
+  current_station_name: string;
   status: string;
   eta: string;
   etd: string;
-  delay: number; // in minutes
+  delay: number;
+  ahead_distance: number;
   ahead_distance_text: string;
   status_as_of: string;
-  update_time: string;
-  distance_from_source: number;
-  total_distance: number;
+  platform_number: number;
+  cur_stn_sta: string;
+  cur_stn_std: string;
+  stoppage_number: number;
   upcoming_stations: Station[];
   previous_stations: Station[];
   next_stoppage_info: NextStoppageInfo;
   current_location_info: CurrentLocationInfo[];
-  avg_speed: number;
-  journey_time: number;
-  std: string; // Source departure
 }
